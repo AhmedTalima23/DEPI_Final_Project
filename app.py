@@ -6,7 +6,7 @@ from collections import Counter
 
 # Load column structure and models
 columns = joblib.load("models/columns.pkl")
-model_names = ['Random Forest', 'XGBoost', 'Gradient Boosting', 'Logitic Regression', 'Decision Tree', 'K-Nearest Neighbors', 'voting']
+model_names = ['Random Forest', 'XGBoost', 'Gradient Boosting', 'Logistic Regression', 'Decision Tree', 'K-Nearest Neighbors', 'voting']
 models = {name: joblib.load(f'models/{name}_model.pkl') for name in model_names}
 
 st.title("🔍 Employee Attrition Prediction")
