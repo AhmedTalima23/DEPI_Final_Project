@@ -9,13 +9,13 @@ columns = joblib.load("models/columns.pkl")
 
 # Define model names (must match saved filenames)
 model_names = [
-    'Random Forest',
-    'XGBoost',
-    'Gradient Boosting',
-    'Logistic Regression',
-    'Decision Tree',
-    'K-Nearest Neighbors',
-    'voting'
+    'Random Forest_model.pkl',
+    'XGBoost_model.pkl',
+    'Gradient Boosting_model.pkl',
+    'Logistic Regression_model.pkl',
+    'Decision Tree_model.pkl',
+    'K-Nearest Neighbors_model.pkl',
+    'voting_model.pkl'
 ]
 
 # Load models from the models folder
