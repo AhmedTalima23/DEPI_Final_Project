@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import joblib
 from collections import Counter
-import matplotlib.pyplot as plt
 
 # Load feature column structure
 try:
@@ -119,18 +118,11 @@ if st.button("Predict Attrition"):
     final_decision = vote_counts.most_common(1)[0][0]
     left_percentage = vote_counts.get("Left", 0) / total_votes
     
-    # Display voting results visualization
+    # Display voting results as text
     st.markdown("---")
     st.subheader("🗳️ Voting Results")
-    
-    fig, ax = plt.subplots(figsize=(8, 3))
-    ax.barh(["Vote Results"], [left_percentage], color='red', label='Left')
-    ax.barh(["Vote Results"], [1-left_percentage], left=left_percentage, color='green', label='Stayed')
-    ax.set_xlim(0, 1)
-    ax.set_xticks([])
-    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.3), ncol=2)
-    ax.set_title(f"Final Decision: {final_decision} ({vote_counts.get('Left', 0)} Left vs {vote_counts.get('Stayed', 0)} Stayed)")
-    st.pyplot(fig)
+    st.write(f"**Final Decision**: {final_decision} ({vote_counts.get('Left', 0)} Left vs {vote_counts.get('Stayed', 0)} Stayed)")
+    st.write(f"**Left Percentage**: {left_percentage:.2%}")
     
     # Display detailed vote breakdown
     st.write("### Detailed Vote Count:")
