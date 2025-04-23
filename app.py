@@ -19,7 +19,7 @@ model_names = [
 ]
 
 # Load models from the models folder
-models = {name: joblib.load(f"models/{name}_model.pkl") for name in model_names}
+models = {name: joblib.load(f"models/{name}") for name in model_names}
 
 st.title("🔍 Employee Attrition Prediction")
 st.write("Please enter employee information below:")
