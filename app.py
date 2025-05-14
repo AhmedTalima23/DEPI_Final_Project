@@ -12,9 +12,9 @@ import numpy as np
 import joblib
 from PIL import Image
 import requests
-from dotenv import load_dotenv
-# Load environment variables
-load_dotenv()
+# from dotenv import load_dotenv
+# # Load environment variables
+# load_dotenv()
 
 
 
