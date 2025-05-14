@@ -26,7 +26,7 @@ GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini
 # Load models and data
 @st.cache_resource
 def load_model_and_columns():
-    models = [joblib.load('XGBoost_model.pkl')]  # Replace with your actual model path
+    models = [joblib.load('XGB.pkl')]  # Replace with your actual model path
     dummy_columns = joblib.load('dummy_columns.pkl')  # Replace with your actual columns path
     return models, dummy_columns
 
