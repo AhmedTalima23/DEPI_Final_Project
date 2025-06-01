@@ -4,4 +4,4 @@ scikit-learn
 joblib
 xgboost
 imbalanced-learn
-
+google-generativeai
