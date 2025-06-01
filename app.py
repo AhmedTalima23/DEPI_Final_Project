@@ -1,4 +1,12 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+import joblib
+from PIL import Image
+import requests # Keeping requests for now as it was in original code, but will refactor to genai
+import os
+# from dotenv import dotenv_values # Removed dotenv import
+import google.generativeai as genai # Import google.generativeai
 
 # MUST BE THE FIRST STREAMLIT COMMAND
 st.set_page_config(
@@ -8,28 +16,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- Configuration for API Key ---
+# Hardcoded API key as requested.
+# NOTE: For production environments, it is highly recommended to use environment variables
+# or a secure secrets management service instead of hardcoding API keys.
+api_key = "AIzaSyAmSUHmgkGVQMIFhqe7EQaPg2RQ7lDy8w4" # Your Gemini API Key here
 
-import pandas as pd
-import numpy as np
-import joblib
-from PIL import Image
-import requests
-# from dotenv import load_dotenv
-# # Load environment variables
-# load_dotenv()
+if not api_key:
+    st.error("Gemini API Key is not set. Please provide your API key in the script.")
+    st.stop()
+else:
+    # Configure genai for both chatbot and report generation
+    genai.configure(api_key=api_key)
 
+# Initialize the Generative Models
+# Model for the Employee Service Chatbot (conversational)
+chatbot_model = genai.GenerativeModel('gemini-2.0-flash')
+# Model for the Report Generator (as per original code, if different)
+report_model = genai.Generativeai.GenerativeModel('gemini-1.5-flash')
 
-
-
-# Configuration
-GEMINI_API_KEY = "AIzaSyAmSUHmgkGVQMIFhqe7EQaPg2RQ7lDy8w4"
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
 # Load models and data
 @st.cache_resource
 def load_model_and_columns():
-    models = [joblib.load('XGB.pkl')]  # Replace with your actual model path
-    dummy_columns = joblib.load('dummy_columns.pkl')  # Replace with your actual columns path
+    # Replace with your actual model path
+    models = [joblib.load('XGB.pkl')]
+    # Replace with your actual columns path
+    dummy_columns = joblib.load('dummy_columns.pkl')
     return models, dummy_columns
 
 models, dummy_columns = load_model_and_columns()
@@ -172,28 +185,13 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Function to call Gemini API
-def call_gemini_api(prompt):
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
-    
+# Function to call Gemini API for Report Generation (using report_model)
+def call_gemini_api_for_report(prompt):
     try:
-        response = requests.post(
-            f"{GEMINI_API_URL}?key={GEMINI_API_KEY}",
-            headers=headers,
-            json=payload
-        )
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        st.error(f"Error with Gemini API request: {str(e)}")
+        response = report_model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        st.error(f"Error with Gemini API request for report: {str(e)}")
         return None
 
 # Generate report using Gemini
@@ -223,16 +221,15 @@ def generate_employee_report(employee_data, prediction_result, probability):
     Format the response in professional business language with clear sections.
     """
     
-    response = call_gemini_api(prompt)
-    if response and 'candidates' in response and len(response['candidates']) > 0:
-        return response['candidates'][0]['content']['parts'][0]['text']
-    return None
+    report_text = call_gemini_api_for_report(prompt)
+    return report_text
 
 # App header
 def render_header():
     col1, col2 = st.columns([1, 2])
     with col1:
-        st.image(Image.open("churn.png"), width=400)  # Replace with your image path
+        # Replace with your image path
+        st.image(Image.open("churn.png"), width=400)
     with col2:
         st.markdown("""
         <div class="header-text">
@@ -253,14 +250,14 @@ def prediction_page():
         
         with st.expander("Personal Factors", expanded=True):
             satisfaction_level = st.slider("Satisfaction Level", 0.0, 1.0, 0.5, 0.01,
-                                        help="Employee's overall job satisfaction")
+                                            help="Employee's overall job satisfaction")
             st.caption(f"Current value: {satisfaction_level:.0%}")
             
             department = st.selectbox("Department", 
-                                  ['sales', 'technical', 'support', 'hr', 
-                                   'accounting', 'marketing', 'product_mng', 
-                                   'management', 'RandD'],
-                                  help="Employee's department")
+                                    ['sales', 'technical', 'support', 'hr', 
+                                     'accounting', 'marketing', 'product_mng', 
+                                     'management', 'RandD'],
+                                    help="Employee's department")
             
             salary = st.selectbox("Salary Level", ['low', 'medium', 'high'],
                                 help="Employee's salary tier")
@@ -273,18 +270,18 @@ def prediction_page():
                 number_project = st.number_input("Project Count", 1, 10, 3)
             
             average_montly_hours = st.slider("Monthly Hours", 50, 400, 160, 10,
-                                          help="Average working hours per month")
+                                             help="Average working hours per month")
         
         with st.expander("Employment History", expanded=False):
             time_spend_company = st.select_slider("Company Tenure", 
-                                               options=list(range(1, 21)), 
-                                               value=3)
+                                                options=list(range(1, 21)), 
+                                                value=3)
             
             work_accident = st.radio("Work Accident", ["No", "Yes"], index=0,
-                                  horizontal=True)
+                                     horizontal=True)
             
             promotion_last_5years = st.radio("Recent Promotion", ["No", "Yes"], 
-                                          index=0, horizontal=True)
+                                             index=0, horizontal=True)
         
         predict_clicked = st.button("Assess Retention Risk", type="primary")
 
@@ -423,8 +420,8 @@ def home_page():
     Get started by selecting a section from the sidebar.
     """)
     
-    st.image(Image.open("hr_analytics.jpg"), width=700)  # Replace with your image path
-
+    # Replace with your image path
+    st.image(Image.open("hr_analytics.jpg"), width=700)
 
 
 # Report Generator page
@@ -440,9 +437,9 @@ def report_generator_page():
             age = st.number_input("Age", min_value=18, max_value=100, value=30)
             monthly_income = st.number_input("Monthly Income", min_value=1000, max_value=100000, value=5000)
             department = st.selectbox("Department", 
-                                   ['Sales', 'Technical', 'Support', 'HR', 
-                                    'Accounting', 'Marketing', 'Product Management', 
-                                    'Management', 'R&D'])
+                                    ['Sales', 'Technical', 'Support', 'HR', 
+                                     'Accounting', 'Marketing', 'Product Management', 
+                                     'Management', 'R&D'])
         with col2:
             years_at_company = st.number_input("Years at Company", min_value=0, max_value=50, value=5)
             distance_from_home = st.number_input("Distance from Home (miles)", min_value=0, max_value=100, value=10)
@@ -454,7 +451,7 @@ def report_generator_page():
         
         submitted = st.form_submit_button("Generate Comprehensive Report")
     
-    if submitted and GEMINI_API_KEY:
+    if submitted and api_key: # Use the unified api_key variable
         with st.spinner("Generating detailed report..."):
             employee_data = {
                 'age': age,
@@ -487,8 +484,56 @@ def report_generator_page():
                 )
             else:
                 st.error("Failed to generate report. Please try again.")
-    elif submitted and not GEMINI_API_KEY:
+    elif submitted and not api_key:
         st.error("Gemini API key not configured. Report generation disabled.")
+
+# New: Employee Service Chatbot page
+def employee_chatbot_page():
+    st.title("🤖 Employee Service Chatbot")
+    st.markdown("How can I assist you today?")
+
+    # Initialize chat history in Streamlit's session state
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display previous chat messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Chat input from the user
+    if prompt := st.chat_input("Ask me anything..."):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                try:
+                    # Prepare the chat history for the Gemini model
+                    chat_history_for_gemini = []
+                    for msg in st.session_state.messages:
+                        if msg["role"] == "user":
+                            chat_history_for_gemini.append({"role": "user", "parts": [msg["content"]]})
+                        elif msg["role"] == "assistant":
+                            chat_history_for_gemini.append({"role": "model", "parts": [msg["content"]]})
+
+                    # Use the chatbot_model for conversational AI
+                    response = chatbot_model.generate_content(
+                        chat_history_for_gemini,
+                        # generation_config=genai.types.GenerationConfig(temperature=0.7)
+                    )
+
+                    full_response = response.text
+                    st.markdown(full_response)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+                    full_response = "I apologize, but I encountered an error while processing your request. Please try again."
+
+            # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 
 # Footer
 def render_footer():
@@ -516,10 +561,11 @@ def render_footer():
 def main():
     # Navigation
     pages = {
-        " Home": home_page,
+        "🏠 Home": home_page,
         "🔮 Prediction Dashboard": prediction_page,
         "📈 Analytics Insights": analytics_page,
-        "📝 Report Generator": report_generator_page
+        "📝 Report Generator": report_generator_page,
+        "💬 Employee Service Chatbot": employee_chatbot_page # New chatbot page
     }
     
     with st.sidebar:
