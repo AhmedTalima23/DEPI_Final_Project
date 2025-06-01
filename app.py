@@ -5,8 +5,7 @@ import joblib
 from PIL import Image
 import requests
 import os
-# from dotenv import dotenv_values # Removed dotenv import
-import google.generativeai as genai # Import google.generativeai
+import google.generativeai as genai
 
 # MUST BE THE FIRST STREAMLIT COMMAND
 st.set_page_config(
@@ -16,25 +15,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Configuration for API Key ---
-# Hardcoded API key as requested.
-# NOTE: For production environments, it is highly recommended to use environment variables
-# or a secure secrets management service instead of hardcoding API keys.
-api_key = "AIzaSyAmSUHmgkGVQMIFhqe7EQaPg2RQ7lDy8w4" # Your Gemini API Key here
+# --- Configuration for API Keys ---
+# Please replace these with your actual Gemini API Keys.
+# CHATBOT_API_KEY is for the "Employee Service Chatbot" page.
+CHATBOT_API_KEY = "AIzaSyCvkhwah2VMclSpfly_4EcXQTH-KHMUQuU"
+# REPORT_API_KEY is for the "Report Generator" page.
+REPORT_API_KEY = "AIzaSyBQMgjsp-Ht4cIzdbc2PNEhvmGnxgk7ZVg"
 
-if not api_key:
-    st.error("Gemini API Key is not set. Please provide your API key in the script.")
+
+# Check if both API keys are set
+if not CHATBOT_API_KEY or CHATBOT_API_KEY == "YOUR_CHATBOT_GEMINI_API_KEY_HERE":
+    st.error("Chatbot Gemini API Key is not set. Please replace 'YOUR_CHATBOT_GEMINI_API_KEY_HERE' in the script.")
     st.stop()
-else:
-    # Configure genai for both chatbot and report generation
-    genai.configure(api_key=api_key)
 
-# Initialize the Generative Models
+if not REPORT_API_KEY or REPORT_API_KEY == "YOUR_REPORT_GENERATOR_GEMINI_API_KEY_HERE":
+    st.error("Report Generator Gemini API Key is not set. Please replace 'YOUR_REPORT_GENERATOR_GEMINI_API_KEY_HERE' in the script.")
+    st.stop()
+
+
+# Initialize the Generative Models with their specific API keys
 # Model for the Employee Service Chatbot (conversational)
-chatbot_model = genai.GenerativeModel('gemini-2.0-flash')
-# Model for the Report Generator (as per original code, if different)
-# CORRECTED LINE: Removed the extra 'Generativeai'
-report_model = genai.GenerativeModel('gemini-1.5-flash')
+chatbot_model = genai.GenerativeModel('gemini-2.0-flash', api_key=CHATBOT_API_KEY)
+# Model for the Report Generator
+report_model = genai.GenerativeModel('gemini-1.5-flash', api_key=REPORT_API_KEY)
 
 
 # Load models and data
@@ -192,7 +195,7 @@ def call_gemini_api_for_report(prompt):
         response = report_model.generate_content(prompt)
         return response.text
     except Exception as e:
-        st.error(f"Error with Gemini API request for report: {str(e)}")
+        st.error(f"An error occurred with the Report Generator API: {str(e)}")
         return None
 
 # Generate report using Gemini
@@ -452,7 +455,7 @@ def report_generator_page():
         
         submitted = st.form_submit_button("Generate Comprehensive Report")
     
-    if submitted and api_key: # Use the unified api_key variable
+    if submitted and REPORT_API_KEY: # Check if REPORT_API_KEY is set
         with st.spinner("Generating detailed report..."):
             employee_data = {
                 'age': age,
@@ -485,8 +488,8 @@ def report_generator_page():
                 )
             else:
                 st.error("Failed to generate report. Please try again.")
-    elif submitted and not api_key:
-        st.error("Gemini API key not configured. Report generation disabled.")
+    elif submitted and not REPORT_API_KEY:
+        st.error("Report Generator API key not configured. Report generation disabled.")
 
 # New: Employee Service Chatbot page
 def employee_chatbot_page():
@@ -529,7 +532,7 @@ def employee_chatbot_page():
                     full_response = response.text
                     st.markdown(full_response)
                 except Exception as e:
-                    st.error(f"An error occurred: {e}")
+                    st.error(f"An error occurred with the Chatbot API: {e}")
                     full_response = "I apologize, but I encountered an error while processing your request. Please try again."
 
             # Add assistant response to chat history
