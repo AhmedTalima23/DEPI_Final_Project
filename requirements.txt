@@ -5,3 +5,4 @@ joblib
 xgboost
 imbalanced-learn
 google-generativeai
+google-generativeai
