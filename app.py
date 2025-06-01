@@ -516,7 +516,7 @@ def render_footer():
 def main():
     # Navigation
     pages = {
-        "🏠 Home": home_page,
+        " Home": home_page,
         "🔮 Prediction Dashboard": prediction_page,
         "📈 Analytics Insights": analytics_page,
         "📝 Report Generator": report_generator_page
