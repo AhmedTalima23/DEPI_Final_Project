@@ -35,8 +35,12 @@ if not REPORT_API_KEY or REPORT_API_KEY == "YOUR_REPORT_GENERATOR_GEMINI_API_KEY
 
 # Initialize the Generative Models with their specific API keys
 # Model for the Employee Service Chatbot (conversational)
+# Note: The 'api_key' argument is supported in recent versions of google-generativeai.
+# If you encounter a TypeError, please upgrade your 'google-generativeai' library.
 chatbot_model = genai.GenerativeModel('gemini-2.0-flash', api_key=CHATBOT_API_KEY)
 # Model for the Report Generator
+# Note: The 'api_key' argument is supported in recent versions of google-generativeai.
+# If you encounter a TypeError, please upgrade your 'google-generativeai' library.
 report_model = genai.GenerativeModel('gemini-1.5-flash', api_key=REPORT_API_KEY)
 
 
