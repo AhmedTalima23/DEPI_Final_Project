@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 from PIL import Image
-import requests # Keeping requests for now as it was in original code, but will refactor to genai
+import requests
 import os
 # from dotenv import dotenv_values # Removed dotenv import
 import google.generativeai as genai # Import google.generativeai
@@ -33,7 +33,8 @@ else:
 # Model for the Employee Service Chatbot (conversational)
 chatbot_model = genai.GenerativeModel('gemini-2.0-flash')
 # Model for the Report Generator (as per original code, if different)
-report_model = genai.Generativeai.GenerativeModel('gemini-1.5-flash')
+# CORRECTED LINE: Removed the extra 'Generativeai'
+report_model = genai.GenerativeModel('gemini-1.5-flash')
 
 
 # Load models and data
