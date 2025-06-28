@@ -22,6 +22,8 @@ st.set_page_config(
 # or a secure secrets management service instead of hardcoding API keys.
 api_key = "AIzaSyAmSUHmgkGVQMIFhqe7EQaPg2RQ7lDy8w4" # Your Gemini API Key here
 
+
+
 if not api_key:
     st.error("Gemini API Key is not set. Please provide your API key in the script.")
     st.stop()
@@ -566,7 +568,7 @@ def main():
         "🔮 Prediction Dashboard": prediction_page,
         "📈 Analytics Insights": analytics_page,
         "📝 Report Generator": report_generator_page,
-        "💬 Employee Service Chatbot": employee_chatbot_page # New chatbot page
+        " Employee Service Chatbot": employee_chatbot_page # New chatbot page
     }
     
     with st.sidebar:
