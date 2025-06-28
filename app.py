@@ -568,7 +568,7 @@ def main():
         "🔮 Prediction Dashboard": prediction_page,
         "📈 Analytics Insights": analytics_page,
         "📝 Report Generator": report_generator_page,
-        " Employee Service Chatbot": employee_chatbot_page # New chatbot page
+        "💬 Employee Service Chatbot": employee_chatbot_page # New chatbot page
     }
     
     with st.sidebar:
