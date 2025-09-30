@@ -20,7 +20,7 @@ st.set_page_config(
 # Hardcoded API key as requested.
 # NOTE: For production environments, it is highly recommended to use environment variables
 # or a secure secrets management service instead of hardcoding API keys.
-api_key = "AIzaSyAmSUHmgkGVQMIFhqe7EQaPg2RQ7lDy8w4" # Your Gemini API Key here
+ # Your Gemini API Key here
 
 
 
@@ -581,3 +581,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
